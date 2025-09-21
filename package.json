@@ -1,0 +1,50 @@
+{
+  "name": "@vaultum/abi",
+  "version": "0.2.0",
+  "description": "Canonical ABI definitions and network addresses for Vaultum V2 smart contracts - Data Only Package",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js", 
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "prepack": "pnpm run build"
+  },
+  "keywords": [
+    "vaultum",
+    "abi",
+    "smart-contracts", 
+    "account-abstraction",
+    "erc-4337",
+    "v2",
+    "session-keys",
+    "spending-limits",
+    "data-package"
+  ],
+  "author": "Vaultum Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vaultum/abi"
+  },
+  "homepage": "https://github.com/vaultum/abi#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  }
+}

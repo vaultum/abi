@@ -1,0 +1,15 @@
+# ABI Package Ownership
+
+# ABI and address map are release artifacts
+src/abis/**            @vaultum/release-lead
+src/addresses/**       @vaultum/release-lead  
+src/index.ts           @vaultum/release-lead
+package.json           @vaultum/release-lead
+README.md              @vaultum/release-lead
+
+# Build and deployment configuration
+tsconfig.json          @vaultum/release-lead
+.github/**             @vaultum/release-lead
+
+# Root configuration
+*                      @vaultum/release-lead

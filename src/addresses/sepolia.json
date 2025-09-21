@@ -1,0 +1,10 @@
+{
+  "chainId": 11155111,
+  "contracts": {
+    "SmartAccount": "0xB7747367A657532b744ff4676C3C86866FBA6141",
+    "SocialRecoveryModule": "0x80D65Fa661038079e92aE708498d55d35617405D",
+    "SessionKeyValidator": "0x82D68EE4Bf9a1F3a4174257a94F4E6a2f40eE209",
+    "SessionKeyModule": "0xF80C03D69c9B264FC30b0D9E3EbC12548C13864f",
+    "SpendingLimitModule": "0xbF23835e96A7afBf29585D39B186B3284eD1111E"
+  }
+}

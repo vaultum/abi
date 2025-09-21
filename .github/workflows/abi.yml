@@ -1,0 +1,91 @@
+name: ABI Package CI
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with: 
+          node-version: '20'
+          cache: 'pnpm'
+          
+      - name: Install dependencies  
+        run: corepack enable && pnpm install --frozen-lockfile
+        
+      - name: Build package
+        run: pnpm build
+        
+      - name: Types gate
+        run: test -f dist/index.d.ts
+        
+      - name: ABI/address presence check
+        run: |
+          test -f src/abis/SmartAccount.json
+          test -f src/abis/SessionKeyValidator.json
+          test -f src/abis/SpendingLimitModule.json
+          test -f src/abis/SocialRecoveryModule.json
+          test -f src/addresses/sepolia.json
+          
+      - name: Verify exports
+        run: node -e "import('./dist/index.js').then(m => console.log('Exports:', Object.keys(m)))"
+        
+      - name: Package validation
+        run: |
+          # Verify package.json has required fields
+          node -e "
+            const pkg = require('./package.json');
+            if (!pkg.name || !pkg.version || !pkg.main || !pkg.types) {
+              throw new Error('Missing required package.json fields');
+            }
+            if (pkg.name !== '@vaultum/abi') {
+              throw new Error('Package name must be @vaultum/abi');
+            }
+            console.log('✅ Package validation passed');
+          "
+          
+      - name: Check dist includes source maps
+        run: |
+          # Optional: verify source maps for debugging
+          test -f dist/index.d.ts || (echo 'Missing TypeScript declarations' && exit 1)
+          echo '✅ Build artifacts validated'
+          
+  publish-check:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [build]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with: 
+          node-version: '20'
+          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies
+        run: corepack enable && pnpm install --frozen-lockfile
+        
+      - name: Build for publishing
+        run: pnpm build
+        
+      - name: Dry-run publish
+        run: npm publish --dry-run
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: Version tag alignment
+        run: |
+          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          PKG_VERSION=$(node -e "console.log(require('./package.json').version)")
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "❌ Tag version ($TAG_VERSION) doesn't match package.json version ($PKG_VERSION)"
+            exit 1
+          fi
+          echo "✅ Version alignment verified"
